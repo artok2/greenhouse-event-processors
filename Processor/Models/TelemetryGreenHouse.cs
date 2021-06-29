@@ -13,6 +13,12 @@ namespace GreenHouse.Event.Processor.Models
         [JsonPropertyName("temperature")]
         public double Temperature { get; set; }
 
+        [JsonPropertyName("cpuTemperature")]
+        public double CPUTemperature { get; set; }
+
+        [JsonPropertyName("altitude")]
+        public double Altitude { get; set; }
+
         [JsonPropertyName("humidity")]
         public double Humidity { get; set; }
 

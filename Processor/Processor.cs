@@ -46,18 +46,22 @@ namespace GreenHouse.Event.Processor
                     var jsonBody = Encoding.UTF8.GetString(eventData.Body);
                     
                     log.LogInformation($"V2 C# IoT Hub trigger function processed a message: {jsonBody}");
+                    if (jsonBody.Contains("[")) return;
 
                     var data = JsonConvert.DeserializeObject<TelemetryGreenHouse>(jsonBody);
-                    var temperatureEntity = new TemperatureEntity
+                    var telemetryEntity = new TelmetryEntity
                     {
                         PartitionKey = "temperature",// data.PartitionKey,                      
                         DeviceId = data.DeviceId,
-                        // Id = eventData.SystemProperties["iothub-connection-device-id"].ToString(),
-
+                        Altitude = data.Altitude,
+                        Pressure = data.Pressure,
+                        Humidity = data.Humidity,
+                        CPUTemperature = data.CPUTemperature,
                         Temperature = data.Temperature
                     };
 
-                    await items.AddAsync(temperatureEntity);
+                    // Id = eventData.SystemProperties["iothub-connection-device-id"].ToString(),
+                    await items.AddAsync(telemetryEntity);
 
                 }
                 catch (Exception e)
@@ -88,7 +92,7 @@ namespace GreenHouse.Event.Processor
           SqlQuery = "SELECT top 1 * FROM greenhouse where greenhouse.deviceId ={devicename} order by greenhouse._ts desc")
               ]
            
-            IEnumerable<TemperatureEntity> entities,
+            IEnumerable<TelmetryEntity> entities,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -115,7 +119,7 @@ namespace GreenHouse.Event.Processor
           SqlQuery = "SELECT TOP 10 * FROM greenhouse where greenhouse.partitionKey ='temperature' order by greenhouse._ts desc")
               ]
 
-            IEnumerable<TemperatureEntity> entities,
+            IEnumerable<TelmetryEntity> entities,
          ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
